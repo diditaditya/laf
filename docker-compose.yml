@@ -1,0 +1,21 @@
+version: '3'
+services:
+  laf-api:
+    build: .
+    container_name: "laf-api"
+    volumes:
+      - "./src:/laf/src"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - laf-db
+    restart: always
+    command: npm start
+  laf-db:
+    image: "postgres:10-alpine"
+    container_name: "laf-db"
+    environment:
+      - POSTGRES_USER=laf
+      - POSTGRES_PASSWORD=laf
+      - POSTGRES_DB=laf
+    restart: always
