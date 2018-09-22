@@ -1,17 +1,17 @@
-const Sequelize = require('sequelize');
-let db = require('./db');
-let utils = require('./utils');
-let app = require('./app');
+const Sequelize = require("sequelize");
+let db = require("./db");
+let utils = require("./utils");
+let app = require("./app");
 
 class Models {
   constructor() {
     this._models = {};
     this._stdFields = [
-        { name: 'id', type: 'integer', autoIncrement: true },
-        { name: 'created_at', type: 'date' },
-        { name: 'updated_at', type: 'date' },
-        { name: 'deleted_at', type: 'date' }
-      ];
+      { name: "id", type: "integer", autoIncrement: true },
+      { name: "created_at", type: "date" },
+      { name: "updated_at", type: "date" },
+      { name: "deleted_at", type: "date" }
+    ];
   }
 
   get models() {
@@ -20,7 +20,7 @@ class Models {
 
   createModel(schema) {
     if (!schema.name) {
-      let err = new Error('schema name required');
+      let err = new Error("schema name required");
       throw err;
     }
     let fields = JSON.parse(JSON.stringify(this._stdFields));
@@ -31,8 +31,8 @@ class Models {
     fields.map(field => {
       let data = {};
       data.type = Sequelize[field.type.toUpperCase()];
-      field.name === 'id' ? data.primaryKey = true : null;
-			field.autoIncrement ? data.autoIncrement = true : null;
+      field.name === "id" ? (data.primaryKey = true) : null;
+      field.autoIncrement ? (data.autoIncrement = true) : null;
       columns[field.name] = data;
     });
     let options = {};
@@ -41,16 +41,20 @@ class Models {
     let model = db.connection.define(schema.name, columns, options);
     this._models[schema.name] = model;
     db.connection.sync();
-		console.log(`model for ${schema.name} has been created`);
-    return { name: schema.name, fields: model.rawAttributes, associations: model.associations }
+    console.log(`model for ${schema.name} has been created`);
+    return {
+      name: schema.name,
+      fields: model.rawAttributes,
+      associations: model.associations
+    };
   }
 
-	generateModels() {
-		let schemas = app.tableConfig;
-		for (let name in schemas) {
-			this.createModel(schemas[name]);
-		}
-	}
+  generateModels() {
+    let schemas = app.tableConfig;
+    for (let name in schemas) {
+      this.createModel(schemas[name]);
+    }
+  }
 }
 
 let instance = null;
