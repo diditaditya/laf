@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prettify" : "node_modules/.bin/prettier --write 'src/**/*.js'"
   },
   "author": "",
   "license": "ISC",

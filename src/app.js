@@ -1,43 +1,43 @@
-const express = require('express');
-const bodyParser = require('body-parser');
+const express = require("express");
+const bodyParser = require("body-parser");
 
-const router = require('./router');
+const router = require("./router");
 
 class App {
   constructor() {
     this.app = express();
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(bodyParser.json());
-		this._config = {};
-		this._tableConfig = {};
-		this._defaultTables = [];
+    this._config = {};
+    this._tableConfig = {};
+    this._defaultTables = [];
   }
 
-	get config() {
-		return this._config;
-	}
+  get config() {
+    return this._config;
+  }
 
-	get tableConfig() {
-		return this._tableConfig;
-	}
+  get tableConfig() {
+    return this._tableConfig;
+  }
 
-	get defaultTables() {
-		return this._defaultTables;
-	}
+  get defaultTables() {
+    return this._defaultTables;
+  }
 
-	set config(conf) {
-		this._config = conf;
-	}
+  set config(conf) {
+    this._config = conf;
+  }
 
-	set tableConfig(conf) {
-		this._tableConfig = conf;
-	}
+  set tableConfig(conf) {
+    this._tableConfig = conf;
+  }
 
-	set defaultTables(tables) {
-		this._defaultTables = tables;
-	}
+  set defaultTables(tables) {
+    this._defaultTables = tables;
+  }
 
-  addRoute(path, method, main, options={}) {
+  addRoute(path, method, main, options = {}) {
     let middlewares = [];
     if (options.auth) {
       middlewares = middlewares.concat(options.auth);
@@ -53,19 +53,19 @@ class App {
   }
 
   addRoutes() {
-		let allRoutes = router.routes;
+    let allRoutes = router.routes;
     for (let name in allRoutes) {
-			console.log(`adding ${name} route..`);
-			let route = allRoutes[name];
-			this.addRoute(route.path, route.method, route.main, route.options);
+      console.log(`adding ${name} route..`);
+      let route = allRoutes[name];
+      this.addRoute(route.path, route.method, route.main, route.options);
     }
   }
-  
+
   addErrorHandler(handler) {
     this.app.use(handler);
   }
-  
-  start(port=3000) {
+
+  start(port = 3000) {
     this.app.listen(port, () => console.log(`listening to port ${port}`));
   }
 }
