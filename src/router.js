@@ -1,4 +1,4 @@
-let utils = require('./utils');
+let app = require('./app');
 let controller = require('./controller');
 
 let customRoutes = require('./routes');
@@ -19,7 +19,7 @@ class Routes {
 	}
 
 	createStandardRoutes() {
-		let tableConfig = utils.tableConfig;
+		let tableConfig = app.tableConfig;
 		for (let name in tableConfig) {
       let controls = controller.createStandardControllers(name);
       let std = { name, actions: [] };

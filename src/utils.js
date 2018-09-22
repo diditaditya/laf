@@ -1,20 +1,12 @@
 const fs = require('fs');
 
+let app = require('./app');
+
 class Utils {
 	constructor() {
 		this._configPath = `${__dirname}/config`;
 		this._tableConfigPath = `${this._configPath}/tables`;
 		this._defaultTablePath = `${this._tableConfigPath}/default`;
-		this._tableConfig = {};
-		this._defaultTables = [];
-	}
-
-	get tableConfig() {
-		return this._tableConfig;
-	}
-
-	set tableConfig(tableConfig) {
-		this._tableConfig = tableConfig;
 	}
 
 	_readDir(path) {
@@ -29,17 +21,24 @@ class Utils {
 		return tableConfig;
 	}
 
+	readConfigFile() {
+		let file = 'config.json';
+		let config = JSON.parse(fs.readFileSync(`${this._configPath}/${file}`));
+		app.config = config;
+		return config;
+	}
+
 	readDefaultTables() {
 		let tableConfig = this._readDir(this._defaultTablePath);
-		this._defaultTables = Object.keys(tableConfig);
-		this._tableConfig = tableConfig;
+		app.defaultTables = Object.keys(tableConfig);
+		app.tableConfig = tableConfig;
 		return tableConfig;
 	}
 	
 	readTableDir(opt={ firstRun: true }) {
 		let tableConfig = this._readDir(this._tableConfigPath);
 		if (opt.firstRun) {
-			this._tableConfig = Object.assign(this._tableConfig, tableConfig);
+			app.tableConfig = Object.assign(app.tableConfig, tableConfig);
 		}
 		return tableConfig;
 	}

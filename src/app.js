@@ -8,7 +8,34 @@ class App {
     this.app = express();
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(bodyParser.json());
+		this._config = {};
+		this._tableConfig = {};
+		this._defaultTables = [];
   }
+
+	get config() {
+		return this._config;
+	}
+
+	get tableConfig() {
+		return this._tableConfig;
+	}
+
+	get defaultTables() {
+		return this._defaultTables;
+	}
+
+	set config(conf) {
+		this._config = conf;
+	}
+
+	set tableConfig(conf) {
+		this._tableConfig = conf;
+	}
+
+	set defaultTables(tables) {
+		this._defaultTables = tables;
+	}
 
   addRoute(path, method, main, options={}) {
     let middlewares = [];
@@ -28,6 +55,7 @@ class App {
   addRoutes() {
 		let allRoutes = router.routes;
     for (let name in allRoutes) {
+			console.log(`adding ${name} route..`);
 			let route = allRoutes[name];
 			this.addRoute(route.path, route.method, route.main, route.options);
     }

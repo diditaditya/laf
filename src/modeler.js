@@ -1,6 +1,7 @@
 const Sequelize = require('sequelize');
 let db = require('./db');
 let utils = require('./utils');
+let app = require('./app');
 
 class Models {
   constructor() {
@@ -18,7 +19,6 @@ class Models {
   }
 
   createModel(schema) {
-		console.log(schema);
     if (!schema.name) {
       let err = new Error('schema name required');
       throw err;
@@ -46,7 +46,7 @@ class Models {
   }
 
 	generateModels() {
-		let schemas = utils.tableConfig;
+		let schemas = app.tableConfig;
 		for (let name in schemas) {
 			this.createModel(schemas[name]);
 		}
