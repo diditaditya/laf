@@ -1,13 +1,21 @@
 {
-	"name": "users",
-	"fields": [
-		{
-			"name": "username",
-			"type": "string"
-		},
-		{
-			"name": "password",
-			"type": "string"
-		}
-	]
+	"users": {
+    "fields": [
+      {
+        "name": "username",
+        "type": "string"
+      },
+      {
+        "name": "password",
+        "type": "string"
+      },
+      {
+        "name": "role_id",
+        "type": "integer",
+        "isForeign": {
+          "tableName": "roles"
+        }
+      }
+    ]
+  }
 }

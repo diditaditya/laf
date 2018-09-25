@@ -15,7 +15,18 @@ class Utils {
     for (let file of files) {
       if (/\.json$/.test(file)) {
         let config = JSON.parse(fs.readFileSync(`${path}/${file}`));
-        tableConfig[config.name] = config;
+        let isNameProp = false;
+        let name = null;
+        if (config.name) {
+          isNameProp = true;
+          name = config.name;
+        } else {
+          let names = Object.keys(config);
+          if (names.length === 1) {
+            name = names[0];
+          }
+        }
+        tableConfig[name] = isNameProp ? config : config[name];
       }
     }
     return tableConfig;
@@ -46,7 +57,7 @@ class Utils {
   saveTableConfig(config) {
     try {
       let name = config.name || "";
-      name = `${name}${Date.now()}.json`;
+      name = `${name}.json`;
       let path = `${this._tableConfigPath}/${name}`;
       let text = JSON.stringify(config);
       fs.writeFileSync(path, text);

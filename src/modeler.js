@@ -18,8 +18,8 @@ class Models {
     return this._models;
   }
 
-  createModel(schema) {
-    if (!schema.name) {
+  createModel(name, schema) {
+    if (!name) {
       let err = new Error("schema name required");
       throw err;
     }
@@ -38,21 +38,33 @@ class Models {
     let options = {};
     options.underscored = true;
     options.freezeTableName = true;
-    let model = db.connection.define(schema.name, columns, options);
-    this._models[schema.name] = model;
+    let model = db.connection.define(name, columns, options);
+    this._models[name] = model;
     db.connection.sync();
-    console.log(`model for ${schema.name} has been created`);
+    console.log(`model for ${name} has been created`);
     return {
-      name: schema.name,
+      name: name,
       fields: model.rawAttributes,
       associations: model.associations
     };
   }
 
+  createAssociation(name, schema) {
+    for (let field of schema.fields) {
+      if (field.isForeign) {
+        let owner = field.isForeign.tableName;
+        this._models[name].belongsTo(this._models[owner]);
+      }
+    }
+  }
+
   generateModels() {
     let schemas = app.tableConfig;
     for (let name in schemas) {
-      this.createModel(schemas[name]);
+      this.createModel(name, schemas[name]);
+    }
+    for (let name in schemas) {
+      this.createAssociation(name, schemas[name]);
     }
   }
 }

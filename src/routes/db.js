@@ -44,7 +44,8 @@ module.exports = {
     method: "post",
     main: async (req, res, next) => {
       try {
-        let newModel = modeler.createModel(req.body);
+        let name = Object.keys(req.body)[0];
+        let newModel = modeler.createModel(name, req.body[name]);
         let data = await db.syncTables(req.body);
         res.send(data);
       } catch (err) {
