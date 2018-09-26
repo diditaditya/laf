@@ -11,7 +11,7 @@
       },
       {
         "name": "role_id",
-        "type": "integer",
+        "type": "uuid",
         "isForeign": {
           "tableName": "roles"
         }

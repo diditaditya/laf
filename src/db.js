@@ -13,13 +13,30 @@ class Db {
     return this._connection;
   }
 
-  set connection(db) {
-    this._connectionSetting = db;
-    this._connection = new Sequelize(db.name, db.user, db.password, {
-      host: db.host,
-      dialect: db.dialect,
-      port: db.port
-    });
+  async setConnection(db) {
+    try {
+      this._connectionSetting = db;
+      this._connection = new Sequelize(db.name, db.user, db.password, {
+        host: db.host,
+        dialect: db.dialect,
+        port: db.port
+      });
+      await this._createUUIDextension();
+      console.log(`uuid extension has been created`);
+    } catch (err) {
+      throw(err);
+    }
+  }
+
+  async _createUUIDextension() {
+    try {
+      if (this._connectionSetting.dialect === "postgres") {
+        let raw = `create extension if not exists "uuid-ossp"`;
+        await this.connection.query(raw);
+      }
+    } catch (err) {
+      throw err;
+    }
   }
 
   async testConnection() {

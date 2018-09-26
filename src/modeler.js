@@ -7,7 +7,7 @@ class Models {
   constructor() {
     this._models = {};
     this._stdFields = [
-      { name: "id", type: "integer", autoIncrement: true },
+      { name: "id", type: "uuid" },
       { name: "created_at", type: "date" },
       { name: "updated_at", type: "date" },
       { name: "deleted_at", type: "date" }
@@ -31,7 +31,14 @@ class Models {
     fields.map(field => {
       let data = {};
       data.type = Sequelize[field.type.toUpperCase()];
-      field.name === "id" ? (data.primaryKey = true) : null;
+      if (field.name === "id") {
+        data.primaryKey = true;
+        if (/^uuid/.test(field.type)) {
+          data.defaultValue = Sequelize.literal('uuid_generate_v4()');
+        } else {
+          data.autoIncrement = true;
+        }
+      }
       field.autoIncrement ? (data.autoIncrement = true) : null;
       columns[field.name] = data;
     });
