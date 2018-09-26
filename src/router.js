@@ -46,8 +46,9 @@ class Routes {
           if (mws.all) {
             options = mws.all;
           }
-          if (mws[method])
-          options = Object.assign(options, mws[method]);
+          if (mws[method]) {
+            options = Object.assign(options, mws[method]);
+          }
         }
 
         this._routes[`${name}_${act}`] = {
