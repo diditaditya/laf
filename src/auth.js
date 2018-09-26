@@ -7,6 +7,7 @@ class Auth {
   async hashPassword(plain) {
     try {
       let hashed = await argon2.hash(plain);
+      return hashed;
     } catch (err) {
       throw err;
     }

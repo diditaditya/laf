@@ -38,18 +38,18 @@ class App {
   }
 
   addRoute(path, method, main, options = {}) {
-    let middlewares = [];
+    let beforemain = [];
     if (options.auth) {
-      middlewares = middlewares.concat(options.auth);
+      beforemain = beforemain.concat(options.auth);
     }
-    if (options.beforecall) {
-      middlewares = middlewares.concate(options.beforecall);
+    if (options.beforemain) {
+      beforemain = beforemain.concat(options.beforemain);
     }
-    let aftercall = [];
-    if (options.aftercall) {
-      aftercall = aftercall.concat(options.aftercall);
+    let aftermain = [];
+    if (options.aftermain) {
+      aftercall = aftercall.concat(options.aftermain);
     }
-    this.app[method](path, ...[...middlewares, main, ...aftercall]);
+    this.app[method](path, ...[...beforemain, main, ...aftermain]);
   }
 
   addRoutes() {

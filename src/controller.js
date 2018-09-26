@@ -1,11 +1,12 @@
+let routils = require("./routils");
 let modeler = require("./modeler");
 let models = modeler.models;
 
 class Controller {
-  async _getData(tableName) {
+  async _getData(tableName, query) {
     try {
+      routils.parseSelect(query.select);
       let model = models[tableName];
-      console.log("model", model);
       let data = await model.findAll();
       return data;
     } catch (err) {
@@ -47,7 +48,7 @@ class Controller {
   getData(tableName) {
     return async (req, res, next) => {
       try {
-        let data = await this._getData(tableName);
+        let data = await this._getData(tableName, req.query);
         res.send({ data });
       } catch (err) {
         next(err);
