@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const async = require("async");
 
 const router = require("./router");
 
@@ -37,19 +38,92 @@ class App {
     this._defaultTables = tables;
   }
 
-  addRoute(path, method, main, options = {}) {
-    let beforemain = [];
-    if (options.auth) {
-      beforemain = beforemain.concat(options.auth);
+  _chain(options, pos) {
+    let chain = [];
+    if (pos === 'before') {
+      if (options.auth) {
+        chain = chain.concat(options.auth);
+      }
+      if (options.beforemain) {
+        chain = chain.concat(options.beforemain);
+      }
+    } else if (pos === 'after') {
+      let aftermain = options.aftermain ? options.aftermain : [];
+      chain = [...aftermain, this._midEnder()];
+    } else {
+      throw(new Error('chain position must be before or after'));
     }
-    if (options.beforemain) {
-      beforemain = beforemain.concat(options.beforemain);
+    return chain;
+  }
+
+  _midEnder() {
+    return (req, res, next) => {}
+  }
+
+  _before() {
+    return (req, res, next) => {
+      let middlewares = router.middlewares;
+      let tableName = req.params.tableName;
+      let method = req.method.toLowerCase();
+      let chain = [];
+      if (middlewares[tableName]) {
+        if (middlewares[tableName][method]) {
+          let options = middlewares[tableName][method];
+          chain = this._chain(options, 'before');
+        }
+      } else if (middlewares.all) {
+        if (middlewares.all[method]) {
+          let options = middlewares.all[method];
+          chain = this._chain(options, 'before');
+        }
+      }
+      if (chain.length > 0) {
+        chain = chain.map(fn => fn.bind(null, req, res, next));
+        async.series(chain, err => {
+          if (err) {
+            return next(err);
+          }
+          next();
+        });
+      } else {
+        next();
+      }
     }
-    let aftermain = [];
-    if (options.aftermain) {
-      aftercall = aftercall.concat(options.aftermain);
+  }
+  
+  _after() {
+    return (req, res, next) => {
+      let middlewares = router.middlewares;
+      let tableName = req.params.tableName;
+      let method = req.method.toLowerCase();
+      let chain = [];
+      if (middlewares[tableName]) {
+        if (middlewares[tableName][method]) {
+          let options = middlewares[tableName][method];
+          chain = this._chain(options, 'after');
+        }
+      } else if (middlewares.all) {
+        if (middlewares.all[method]) {
+          let options = middlewares.all[method];
+          chain = this._chain(options, 'after');
+        }
+      }
+      if (chain.length > 0) {
+        chain = chain.map(fn => fn.bind(null, req, res));
+        async.series(chain, err => {
+          if (err) {
+            return next(err);
+          }
+          next();
+        });
+      } else {
+        next();
+      }
     }
-    this.app[method](path, ...[...beforemain, main, ...aftermain]);
+  }
+
+  addRoute(path, method, main) {
+    this.app[method](path, this._before(), main, this._after());
   }
 
   addRoutes() {

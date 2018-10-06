@@ -28,36 +28,45 @@ class Routes {
     }
   }
 
-  createStandardRoutes() {
-    let tableConfig = app.tableConfig;
-    for (let name in tableConfig) {
-      let controls = controller.createStandardControllers(name);
-      let std = { name, actions: [] };
-      let mws = this._middlewares[name] || null;
-      Object.keys(controls).map(act => {
-        let path = `/${name}`;
-
-        let method = controls[act].method;
-        let idRequired = method === "put" || method === "delete";
-        path = idRequired ? `${path}/:id` : path;
-
-        let options = controls[act].options;
-        if (mws) {
-          if (mws.all) {
-            options = mws.all;
-          }
-          if (mws[method]) {
-            options = Object.assign(options, mws[method]);
-          }
+  _createMiddlewares(method) {
+    return (req, res, next) => {
+      let tableName = req.params.tableName;
+      let mws = this._middlewares;
+      if (mws.default) {
+        if (mws.default.all) {
+          return mws.default.all;
         }
+        if (mws.default[method]) {
 
-        this._routes[`${name}_${act}`] = {
-          path,
-          method,
-          main: controls[act].main,
-          options
-        };
-      });
+        }
+      }
+    }
+  }
+
+  createStandardRoutes() {
+
+    let controls = controller.createStandardControllers();
+    for (let act in controls) {
+      let path = '/:tableName';
+      let method = controls[act].method;
+      let idRequired = method === "put" || method === "delete";
+      path = idRequired ? `${path}/:id` : path;
+      let options = controls[act].options;
+      let mws = this._middlewares || null;
+      if (mws) {
+        if (mws.all) {
+          options = mws.all;
+        }
+        if (mws[method]) {
+          options = Object.assign(options, mws[method]);
+        }
+      }
+      this._routes[act] = {
+        path,
+        method,
+        main: controls[act].main,
+        options
+      }
     }
   }
 }

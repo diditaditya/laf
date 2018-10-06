@@ -40,6 +40,7 @@ let startServer = async () => {
     
     // error handler
     app.addErrorHandler((err, req, res, next) => {
+      console.log(err);
       let message = err.message || "internal server error";
       res.status(500).send({ message });
     });

@@ -45,66 +45,79 @@ class Controller {
     }
   }
 
-  getData(tableName) {
+  getData() {
     return async (req, res, next) => {
       try {
-        let data = await this._getData(tableName, req.query);
+        let data = await this._getData(
+          req.params.tableName,
+          req.query
+        );
         res.send({ data });
+        next();
       } catch (err) {
         next(err);
       }
     };
   }
 
-  postData(tableName) {
+  postData() {
     return async (req, res, next) => {
       try {
-        let created = await this._postData(tableName, req.body);
+        let created = await this._postData(
+          req.params.tableName,
+          req.body
+        );
         res.send({ data: created });
+        next();
       } catch (err) {
         next(err);
       }
     };
   }
 
-  updateData(tableName) {
+  updateData() {
     return async (req, res, next) => {
       try {
         let updated = await this._updateData(
-          tableName,
+          req.params.tableName,
           req.params.id,
           req.body
         );
         res.send({ data: updated });
+        next();
       } catch (err) {
         next(err);
       }
     };
   }
 
-  deleteData(tableName) {
+  deleteData() {
     return async (req, res, next) => {
       try {
-        let deleted = await this._deleteData(tableName, req.params.id);
+        let deleted = await this._deleteData(
+          req.params.tableName,
+          req.params.id
+        );
         res.send({ data: deleted });
+        next();
       } catch (err) {
         next(err);
       }
     };
   }
 
-  createStandardControllers(tableName) {
+  createStandardControllers() {
     return {
-      getData: { method: "get", main: this.getData(tableName), options: {} },
-      postData: { method: "post", main: this.postData(tableName), options: {} },
+      getData: { method: "get", main: this.getData(), options: {} },
+      postData: { method: "post", main: this.postData(), options: {} },
       updateData: {
         method: "put",
-        main: this.updateData(tableName),
+        main: this.updateData(),
         options: {}
       },
       deleteData: {
         method: "delete",
-        main: this.deleteData(tableName),
+        main: this.deleteData(),
         options: {}
       }
     };
